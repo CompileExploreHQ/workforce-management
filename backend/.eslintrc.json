@@ -32,7 +32,23 @@
       { "ignores": ["modules"] }
     ],
     "node/no-missing-import": 0,
-    "node/no-unpublished-import": 0
+    "node/no-unpublished-import": 0,
+    "class-methods-use-this": "off",
+    "import/no-cycle": "warn",
+    "jest/no-try-expect": "warn",
+    "max-classes-per-file": "off",
+    "import/extensions": ["warn", "never"],
+    "import/prefer-default-export": "off",
+    "no-plusplus": "off",
+    "no-unreachable": "error",
+    "prettier/prettier": "warn",
+    "@typescript-eslint/lines-between-class-members": "warn",
+    "@typescript-eslint/promise-function-async": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-expressions": "warn",
+    "@typescript-eslint/switch-exhaustiveness-check": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "brace-style": ["warn", "1tbs", { "allowSingleLine": false }]
   },
   "settings": {
     "node": {

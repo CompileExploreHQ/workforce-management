@@ -4,9 +4,17 @@ import Employee from "@src/repos/EmployeeRepo";
 import { hashPassword, validatePassword } from "@src/util/encryption";
 import { generateUniqueString } from "@src/util/string";
 import { generateToken } from "@src/util/token";
+import { filesListToMap } from "@src/util/multipart";
+import {
+  employeeLoginBodySchema,
+  employeeRegisterBodySchema,
+} from "./validation";
+import { InferType } from "yup";
 
 async function login(
-  req: IReq & { body: { email: string; password: string } },
+  req: IReq & {
+    body: InferType<typeof employeeLoginBodySchema>;
+  },
   res: IRes
 ) {
   const email = req.body.email.trim() as string;
@@ -48,14 +56,16 @@ async function login(
 
 async function register(
   req: IReq & {
-    body: {
-      email: string;
-      name: string;
-      role: "Employee" | "SuperAdmin" | "WorkspaceAdmin";
-    };
+    body: InferType<typeof employeeRegisterBodySchema>;
   },
   res: IRes
 ) {
+  const contentType = req.headers["content-type"] ?? "unknown";
+  let files: Map<string, Express.Multer.File> | undefined;
+  if (contentType?.startsWith("multipart/form-data")) {
+    files = filesListToMap(req.files as Express.Multer.File[]);
+  }
+
   const email = req.body.email.trim();
   const name = req.body.name.trim();
   const role = req.body.role;
@@ -81,6 +91,7 @@ async function register(
   newEmployee.sub = generateUniqueString(20);
   newEmployee.password = password;
   newEmployee.role = role;
+  newEmployee.profilePicture = files?.get("profilePicture")?.buffer?.toString();
   newEmployee.save();
 
   res

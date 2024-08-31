@@ -1,6 +1,6 @@
-import "./pre-start";
 import logger from "jet-logger";
 
+import "./dotenv";
 import EnvVars from "@src/common/EnvVars";
 import server from "./server";
 import connectDB from "./db";

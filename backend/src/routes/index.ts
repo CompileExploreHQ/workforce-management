@@ -12,6 +12,7 @@ import {
   employeeLoginBodySchema,
   employeeRegisterBodySchema,
 } from "@src/routes/Auth/validation";
+import multipartMiddleware from "@src/middleware/multipart";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ const router = Router();
 const authRouter = Router();
 authRouter.post(
   "/register",
+  multipartMiddleware,
   validateRequest({ bodySchema: employeeRegisterBodySchema }),
   AuthRoutes.register
 );
