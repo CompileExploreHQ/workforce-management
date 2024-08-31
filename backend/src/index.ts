@@ -1,10 +1,11 @@
-import "./pre-start"; // Must be the first import
+import "./pre-start";
 import logger from "jet-logger";
 
 import EnvVars from "@src/common/EnvVars";
 import server from "./server";
+import connectDB from "./db";
 
-// **** Run **** //
+connectDB();
 
 const SERVER_START_MSG =
   "Express server started on port: " + EnvVars.Port.toString();

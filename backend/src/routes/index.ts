@@ -1,29 +1,34 @@
 import { Router } from "express";
 
-import Paths from "../common/Paths";
-import UserRoutes from "./UserRoutes";
+import authMiddleware from "@src/middleware/authMiddleware";
+import authCheckErrorHandler from "@src/middleware/authCheckErrorHandler";
+import attachId from "@src/middleware/attachId";
 
-// **** Variables **** //
+import AuthRoutes from "@src/routes/Auth";
+import UserRoutes from "@src/routes/User";
 
-const apiRouter = Router();
-apiRouter.get("/", (req, res) => {
-  // res.json({ status: "ok" }).send();
-});
+const router = Router();
 
-// ** Add UserRouter ** //
+// #region Auth Router
+const authRouter = Router();
+authRouter.post("/register", AuthRoutes.register);
+authRouter.post("/login", AuthRoutes.login);
+router.use("/auth", authRouter);
+// #endregion
 
-// Init router
+// #region Authentications
+router.use(authMiddleware);
+router.use(authCheckErrorHandler);
+router.use(attachId);
+// #endregion
+
+// #region User Router
 const userRouter = Router();
+userRouter.get("/all", UserRoutes.getAll);
+userRouter.post("/add", UserRoutes.add);
+userRouter.put("/update", UserRoutes.update);
+userRouter.delete("/delete/:id", UserRoutes.delete);
+router.use("/users", userRouter);
+// #endregion
 
-// Get all users
-userRouter.get(Paths.Users.Get, UserRoutes.getAll);
-userRouter.post(Paths.Users.Add, UserRoutes.add);
-userRouter.put(Paths.Users.Update, UserRoutes.update);
-userRouter.delete(Paths.Users.Delete, UserRoutes.delete);
-
-// Add UserRouter
-apiRouter.use(Paths.Users.Base, userRouter);
-
-// **** Export default **** //
-
-export default apiRouter;
+export default router;

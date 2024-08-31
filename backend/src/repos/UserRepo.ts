@@ -1,93 +1,45 @@
-import { IUser } from '@src/models/User';
-import { getRandomInt } from '@src/util/misc';
-import orm from './MockOrm';
+// src/models/user.model.ts
 
+import mongoose, { Schema, Document } from "mongoose";
 
-// **** Functions **** //
-
-/**
- * Get one user.
- */
-async function getOne(email: string): Promise<IUser | null> {
-  const db = await orm.openDb();
-  for (const user of db.users) {
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return null;
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  sub: string;
+  password: string;
+  role: "SuperAdmin" | "WorkspaceAdmin" | "Employee";
+  profilePicture?: string;
+  mobile?: string;
+  dob?: Date;
+  department?: string;
+  company?: string;
+  joiningDate?: Date;
+  workspaceId?: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-/**
- * See if a user with the given id exists.
- */
-async function persists(id: number): Promise<boolean> {
-  const db = await orm.openDb();
-  for (const user of db.users) {
-    if (user.id === id) {
-      return true;
-    }
-  }
-  return false;
-}
+const UserSchema: Schema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    sub: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: {
+      type: String,
+      enum: ["SuperAdmin", "WorkspaceAdmin", "Employee"],
+      required: true,
+    },
+    profilePicture: { type: String },
+    mobile: { type: String },
+    dob: { type: Date },
+    department: { type: String },
+    company: { type: String },
+    joiningDate: { type: Date },
+    workspaceId: { type: Schema.Types.ObjectId, ref: "Workspace" },
+  },
+  { timestamps: true }
+);
 
-/**
- * Get all users.
- */
-async function getAll(): Promise<IUser[]> {
-  const db = await orm.openDb();
-  return db.users;
-}
-
-/**
- * Add one user.
- */
-async function add(user: IUser): Promise<void> {
-  const db = await orm.openDb();
-  user.id = getRandomInt();
-  db.users.push(user);
-  return orm.saveDb(db);
-}
-
-/**
- * Update a user.
- */
-async function update(user: IUser): Promise<void> {
-  const db = await orm.openDb();
-  for (let i = 0; i < db.users.length; i++) {
-    if (db.users[i].id === user.id) {
-      const dbUser = db.users[i];
-      db.users[i] = {
-        ...dbUser,
-        name: user.name,
-        email: user.email,
-      };
-      return orm.saveDb(db);
-    }
-  }
-}
-
-/**
- * Delete one user.
- */
-async function delete_(id: number): Promise<void> {
-  const db = await orm.openDb();
-  for (let i = 0; i < db.users.length; i++) {
-    if (db.users[i].id === id) {
-      db.users.splice(i, 1);
-      return orm.saveDb(db);
-    }
-  }
-}
-
-
-// **** Export default **** //
-
-export default {
-  getOne,
-  persists,
-  getAll,
-  add,
-  update,
-  delete: delete_,
-} as const;
+const User = mongoose.model<IUser>("User", UserSchema);
+export default User;
