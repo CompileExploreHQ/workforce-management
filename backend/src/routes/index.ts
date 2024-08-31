@@ -5,14 +5,28 @@ import authCheckErrorHandler from "@src/middleware/authCheckErrorHandler";
 import attachId from "@src/middleware/attachId";
 
 import AuthRoutes from "@src/routes/Auth";
-import UserRoutes from "@src/routes/User";
+import EmployeeRoutes from "@src/routes/Employee";
+import { validateRequest } from "@src/middleware/validator";
+
+import {
+  employeeLoginBodySchema,
+  employeeRegisterBodySchema,
+} from "@src/routes/Auth/validation";
 
 const router = Router();
 
 // #region Auth Router
 const authRouter = Router();
-authRouter.post("/register", AuthRoutes.register);
-authRouter.post("/login", AuthRoutes.login);
+authRouter.post(
+  "/register",
+  validateRequest({ bodySchema: employeeRegisterBodySchema }),
+  AuthRoutes.register
+);
+authRouter.post(
+  "/login",
+  validateRequest({ bodySchema: employeeLoginBodySchema }),
+  AuthRoutes.login
+);
 router.use("/auth", authRouter);
 // #endregion
 
@@ -22,13 +36,10 @@ router.use(authCheckErrorHandler);
 router.use(attachId);
 // #endregion
 
-// #region User Router
-const userRouter = Router();
-userRouter.get("/all", UserRoutes.getAll);
-userRouter.post("/add", UserRoutes.add);
-userRouter.put("/update", UserRoutes.update);
-userRouter.delete("/delete/:id", UserRoutes.delete);
-router.use("/users", userRouter);
+// #region Employee Router
+const employeeRouter = Router();
+employeeRouter.get("/all", EmployeeRoutes.getAll);
+router.use("/employee", employeeRouter);
 // #endregion
 
 export default router;

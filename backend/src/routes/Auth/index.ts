@@ -1,6 +1,6 @@
 import HttpStatusCodes from "@src/common/HttpStatusCodes";
 import { IReq, IRes } from "../common/types";
-import User from "@src/repos/UserRepo";
+import Employee from "@src/repos/EmployeeRepo";
 import { hashPassword, validatePassword } from "@src/util/encryption";
 import { generateUniqueString } from "@src/util/string";
 import { generateToken } from "@src/util/token";
@@ -11,8 +11,8 @@ async function login(
 ) {
   const email = req.body.email.trim() as string;
 
-  const user = await User.findOne({ email });
-  if (!user) {
+  const employee = await Employee.findOne({ email });
+  if (!employee) {
     res
       .status(HttpStatusCodes.BAD_REQUEST)
       .json({
@@ -26,7 +26,7 @@ async function login(
 
   const isValidPassword = await validatePassword(
     req.body.password as string,
-    user.password
+    employee.password
   );
   if (!isValidPassword) {
     res
@@ -40,21 +40,28 @@ async function login(
     return;
   }
 
-  const token = generateToken({ sub: user.sub });
+  const token = generateToken({ sub: employee.sub });
 
   res.status(HttpStatusCodes.OK).json({ token }).send();
   return;
 }
 
 async function register(
-  req: IReq & { body: { email: string; name: string } },
+  req: IReq & {
+    body: {
+      email: string;
+      name: string;
+      role: "Employee" | "SuperAdmin" | "WorkspaceAdmin";
+    };
+  },
   res: IRes
 ) {
-  const email = req.body.email.trim() as string;
-  const name = req.body.name.trim() as string;
+  const email = req.body.email.trim();
+  const name = req.body.name.trim();
+  const role = req.body.role;
 
-  const user = await User.findOne({ email });
-  if (user) {
+  const employee = await Employee.findOne({ email });
+  if (employee) {
     res
       .status(HttpStatusCodes.BAD_REQUEST)
       .json({
@@ -68,13 +75,13 @@ async function register(
 
   const password = await hashPassword(req.body.password as string);
 
-  const newUser = new User();
-  newUser.name = name;
-  newUser.email = email;
-  newUser.sub = generateUniqueString(20);
-  newUser.password = password;
-  newUser.role = "Employee";
-  newUser.save();
+  const newEmployee = new Employee();
+  newEmployee.name = name;
+  newEmployee.email = email;
+  newEmployee.sub = generateUniqueString(20);
+  newEmployee.password = password;
+  newEmployee.role = role;
+  newEmployee.save();
 
   res
     .status(HttpStatusCodes.OK)

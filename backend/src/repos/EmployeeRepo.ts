@@ -1,8 +1,6 @@
-// src/models/user.model.ts
-
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IUser extends Document {
+export interface IEmployee extends Document {
   name: string;
   email: string;
   sub: string;
@@ -19,7 +17,7 @@ export interface IUser extends Document {
   updatedAt?: Date;
 }
 
-const UserSchema: Schema = new Schema(
+const EmployeeSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -41,5 +39,5 @@ const UserSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model<IUser>("User", UserSchema);
-export default User;
+const Employee = mongoose.model<IEmployee>("Employee", EmployeeSchema);
+export default Employee;
