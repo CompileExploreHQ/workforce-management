@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-export const employeeRegisterBodySchema = yup
+export const userRegisterBodySchema = yup
   .object({
     name: yup.string().required(),
     email: yup.string().email().required(),
@@ -12,7 +12,7 @@ export const employeeRegisterBodySchema = yup
   })
   .required();
 
-export const employeeLoginBodySchema = yup
+export const userLoginBodySchema = yup
   .object({
     email: yup.string().email().required(),
     password: yup.string().required(),

@@ -5,12 +5,12 @@ import authCheckErrorHandler from "@src/middleware/authCheckErrorHandler";
 import attachId from "@src/middleware/attachId";
 
 import AuthRoutes from "@src/routes/Auth";
-import EmployeeRoutes from "@src/routes/Employee";
+import UserRoutes from "@src/routes/User";
 import { validateRequest } from "@src/middleware/validator";
 
 import {
-  employeeLoginBodySchema,
-  employeeRegisterBodySchema,
+  userLoginBodySchema,
+  userRegisterBodySchema,
 } from "@src/routes/Auth/validation";
 import multipartMiddleware from "@src/middleware/multipart";
 
@@ -21,12 +21,12 @@ const authRouter = Router();
 authRouter.post(
   "/register",
   multipartMiddleware,
-  validateRequest({ bodySchema: employeeRegisterBodySchema }),
+  validateRequest({ bodySchema: userRegisterBodySchema }),
   AuthRoutes.register
 );
 authRouter.post(
   "/login",
-  validateRequest({ bodySchema: employeeLoginBodySchema }),
+  validateRequest({ bodySchema: userLoginBodySchema }),
   AuthRoutes.login
 );
 router.use("/auth", authRouter);
@@ -38,10 +38,16 @@ router.use(authCheckErrorHandler);
 router.use(attachId);
 // #endregion
 
-// #region Employee Router
-const employeeRouter = Router();
-employeeRouter.get("/all", EmployeeRoutes.getAll);
-router.use("/employee", employeeRouter);
+// #region Workspace Router
+const workspaceRouter = Router();
+workspaceRouter.get("/all", UserRoutes.getAll);
+router.use("/workspace", workspaceRouter);
+// #endregion
+
+// #region User Router
+const userRouter = Router();
+userRouter.get("/all", UserRoutes.getAll);
+router.use("/users", userRouter);
 // #endregion
 
 export default router;

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 // import { getUserIdSessionFromTokenIdentifier } from "./db";
-import UserRepo from "@src/repos/EmployeeRepo";
+import UserRepo from "@src/repos/UserRepo";
 
 export default async function attachId(
   req: Request & { auth?: { sub: string } },

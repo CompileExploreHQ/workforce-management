@@ -1,26 +1,23 @@
 import HttpStatusCodes from "@src/common/HttpStatusCodes";
 import { IReq, IRes } from "../common/types";
-import Employee from "@src/repos/EmployeeRepo";
+import User from "@src/repos/UserRepo";
 import { hashPassword, validatePassword } from "@src/util/encryption";
 import { generateUniqueString } from "@src/util/string";
 import { generateToken } from "@src/util/token";
 import { filesListToMap } from "@src/util/multipart";
-import {
-  employeeLoginBodySchema,
-  employeeRegisterBodySchema,
-} from "./validation";
+import { userLoginBodySchema, userRegisterBodySchema } from "./validation";
 import { InferType } from "yup";
 
 async function login(
   req: IReq & {
-    body: InferType<typeof employeeLoginBodySchema>;
+    body: InferType<typeof userLoginBodySchema>;
   },
   res: IRes
 ) {
   const email = req.body.email.trim() as string;
 
-  const employee = await Employee.findOne({ email });
-  if (!employee) {
+  const user = await User.findOne({ email });
+  if (!user) {
     res
       .status(HttpStatusCodes.BAD_REQUEST)
       .json({
@@ -34,7 +31,7 @@ async function login(
 
   const isValidPassword = await validatePassword(
     req.body.password as string,
-    employee.password
+    user.password
   );
   if (!isValidPassword) {
     res
@@ -48,7 +45,7 @@ async function login(
     return;
   }
 
-  const token = generateToken({ sub: employee.sub });
+  const token = generateToken({ sub: user.sub });
 
   res.status(HttpStatusCodes.OK).json({ token }).send();
   return;
@@ -56,7 +53,7 @@ async function login(
 
 async function register(
   req: IReq & {
-    body: InferType<typeof employeeRegisterBodySchema>;
+    body: InferType<typeof userRegisterBodySchema>;
   },
   res: IRes
 ) {
@@ -70,8 +67,8 @@ async function register(
   const name = req.body.name.trim();
   const role = req.body.role;
 
-  const employee = await Employee.findOne({ email });
-  if (employee) {
+  const user = await User.findOne({ email });
+  if (user) {
     res
       .status(HttpStatusCodes.BAD_REQUEST)
       .json({
@@ -85,14 +82,14 @@ async function register(
 
   const password = await hashPassword(req.body.password as string);
 
-  const newEmployee = new Employee();
-  newEmployee.name = name;
-  newEmployee.email = email;
-  newEmployee.sub = generateUniqueString(20);
-  newEmployee.password = password;
-  newEmployee.role = role;
-  newEmployee.profilePicture = files?.get("profilePicture")?.buffer?.toString();
-  newEmployee.save();
+  const newUser = new User();
+  newUser.name = name;
+  newUser.email = email;
+  newUser.sub = generateUniqueString(20);
+  newUser.password = password;
+  newUser.role = role;
+  newUser.profilePicture = files?.get("profilePicture")?.buffer?.toString();
+  newUser.save();
 
   res
     .status(HttpStatusCodes.OK)
