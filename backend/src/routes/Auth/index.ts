@@ -7,6 +7,7 @@ import { generateToken } from "@src/util/token";
 import { filesListToMap } from "@src/util/multipart";
 import { userLoginBodySchema, userRegisterBodySchema } from "./validation";
 import { InferType } from "yup";
+import { Roles } from "@src/Permissions/Permissions";
 
 async function login(
   req: IReq & {
@@ -87,7 +88,7 @@ async function register(
   newUser.email = email;
   newUser.sub = generateUniqueString(20);
   newUser.password = password;
-  newUser.role = role;
+  newUser.roles = [role];
   newUser.profilePicture = files?.get("profilePicture")?.buffer?.toString();
   newUser.save();
 

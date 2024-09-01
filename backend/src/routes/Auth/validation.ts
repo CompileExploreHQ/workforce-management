@@ -1,3 +1,4 @@
+import { Roles } from "@src/Permissions/Permissions";
 import * as yup from "yup";
 
 export const userRegisterBodySchema = yup
@@ -5,10 +6,7 @@ export const userRegisterBodySchema = yup
     name: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().required(),
-    role: yup
-      .string()
-      .oneOf(["Employee", "SuperAdmin", "WorkspaceAdmin"])
-      .required(),
+    role: yup.string().oneOf(Object.values(Roles), "Invalid role").required(),
   })
   .required();
 

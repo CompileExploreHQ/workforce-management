@@ -1,7 +1,3 @@
-/**
- * Remove old files, copy front-end ones.
- */
-
 import fs from "fs-extra";
 import logger from "jet-logger";
 import childProcess from "child_process";
@@ -13,8 +9,6 @@ import childProcess from "child_process";
   try {
     // Remove current build
     await remove("./dist/");
-    // Copy front-end files
-    await copy("./src/public", "./dist/public");
     // Copy back-end files
     await exec("tsc --build tsconfig.prod.json", "./");
   } catch (err) {
