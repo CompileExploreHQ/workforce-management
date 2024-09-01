@@ -1,10 +1,22 @@
-import HttpStatusCodes from "@src/common/HttpStatusCodes";
-import { IReq, IRes } from "../common/types";
+import jsonApiErrors from "@src/middleware/jsonApiErrors";
+import { Router } from "express";
+import { asyncRoute } from "@src/util/routes";
+import { create } from "./controller";
+import checkAccessZones from "@src/middleware/accessZones";
+import { Permissions } from "@src/Permissions/Permissions";
 
-async function create(_: IReq, res: IRes) {
-  return res.status(HttpStatusCodes.OK).json({ user: { id: "id" } });
-}
+const workspaceRouter = (): Router => {
+  const router = Router();
 
-export default {
-  create,
-} as const;
+  router.post(
+    "/create",
+    checkAccessZones([Permissions.WorkspaceCreate]),
+    asyncRoute(create)
+  );
+
+  router.use(jsonApiErrors());
+
+  return router;
+};
+
+export default workspaceRouter;

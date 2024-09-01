@@ -1,10 +1,12 @@
-import HttpStatusCodes from "@src/common/HttpStatusCodes";
-import { IReq, IRes } from "../common/types";
+import jsonApiErrors from "@src/middleware/jsonApiErrors";
+import { Router } from "express";
 
-async function getAll(_: IReq, res: IRes) {
-  return res.status(HttpStatusCodes.OK).json({ user: { id: "id" } });
-}
+const userRouter = (): Router => {
+  const router = Router();
 
-export default {
-  getAll,
-} as const;
+  router.use(jsonApiErrors());
+
+  return router;
+};
+
+export default userRouter;
