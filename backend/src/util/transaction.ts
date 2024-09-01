@@ -19,7 +19,8 @@ export async function withTransaction<T>(
 
     return result;
   } catch (error) {
-    logger.err("Error occurred during transaction:", error);
+    logger.err("Error occurred during transaction");
+    logger.err(error);
     await session.abortTransaction();
     logger.info("Transaction aborted");
     throw error;

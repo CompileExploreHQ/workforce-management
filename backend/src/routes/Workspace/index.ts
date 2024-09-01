@@ -6,12 +6,16 @@ import {
   getAllWorkspaces,
   getWorkspaceDetailsController,
   getWorkspaceUsersController,
+  putWorkspaceDetailsController,
 } from "./controller";
 import checkAccessZones from "@src/middleware/accessZones";
 import { Permissions } from "@src/Permissions/Permissions";
 import { validateRequest } from "@src/middleware/validator";
 import {
+  getWorkspaceDetailsPathParamsSchema,
   getWorkspaceUserPathParamsSchema,
+  putWorkspaceDetailsBodySchema,
+  putWorkspaceDetailsPathParamsSchema,
   workspaceCreateBodySchema,
 } from "./validation";
 
@@ -34,8 +38,18 @@ const workspaceRouter = (): Router => {
   router.get(
     "/:workspaceId/details",
     checkAccessZones([Permissions.WorkspaceRead]),
-    validateRequest({ paramsSchema: getWorkspaceUserPathParamsSchema }),
+    validateRequest({ paramsSchema: getWorkspaceDetailsPathParamsSchema }),
     asyncRoute(getWorkspaceDetailsController)
+  );
+
+  router.put(
+    "/:workspaceId/details",
+    checkAccessZones([Permissions.WorkspaceEdit]),
+    validateRequest({
+      paramsSchema: putWorkspaceDetailsPathParamsSchema,
+      bodySchema: putWorkspaceDetailsBodySchema,
+    }),
+    asyncRoute(putWorkspaceDetailsController)
   );
 
   router.get(

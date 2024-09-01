@@ -26,3 +26,18 @@ export const getWorkspaceUserPathParamsSchema = yup
     workspaceId: yup.string().required(),
   })
   .required();
+
+export const putWorkspaceDetailsPathParamsSchema = yup
+  .object({
+    workspaceId: yup.string().required(),
+  })
+  .required();
+
+export const putWorkspaceDetailsBodySchema = yup
+  .object({
+    name: yup.string(),
+    email: yup.string().email(),
+    phoneNumber: yup.string().matches(phoneRegex, "Invalid Phone Number"),
+    address: yup.string(),
+  })
+  .required();

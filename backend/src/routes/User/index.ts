@@ -1,8 +1,12 @@
 import jsonApiErrors from "@src/middleware/jsonApiErrors";
 import { Router } from "express";
-import { getUserDetails } from "./contrroller";
+import { getUserDetails, putUserDetails } from "./contrroller";
 import { validateRequest } from "@src/middleware/validator";
-import { getUserDetailsPathParamsSchema } from "./validation";
+import {
+  getUserDetailsPathParamsSchema,
+  putUserDetailsBodySchema,
+  putUserDetailsPathParamsSchema,
+} from "./validation";
 import checkAccessZones from "@src/middleware/accessZones";
 import { Permissions } from "@src/Permissions/Permissions";
 import { asyncRoute } from "@src/util/routes";
@@ -15,6 +19,16 @@ const userRouter = (): Router => {
     checkAccessZones([Permissions.UserRead]),
     validateRequest({ paramsSchema: getUserDetailsPathParamsSchema }),
     asyncRoute(getUserDetails)
+  );
+
+  router.put(
+    "/:userId/details",
+    checkAccessZones([Permissions.UserEdit]),
+    validateRequest({
+      paramsSchema: putUserDetailsPathParamsSchema,
+      bodySchema: putUserDetailsBodySchema,
+    }),
+    asyncRoute(putUserDetails)
   );
 
   router.use(jsonApiErrors());

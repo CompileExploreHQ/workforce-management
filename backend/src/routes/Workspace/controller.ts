@@ -2,6 +2,8 @@ import { InferType } from "yup";
 import {
   getWorkspaceDetailsPathParamsSchema,
   getWorkspaceUserPathParamsSchema,
+  putWorkspaceDetailsBodySchema,
+  putWorkspaceDetailsPathParamsSchema,
   workspaceCreateBodySchema,
 } from "./validation";
 import { withTransaction } from "@src/util/transaction";
@@ -9,7 +11,11 @@ import { ClientSession } from "mongoose";
 import { filesListToMap } from "@src/util/multipart";
 import Workspace from "@src/repos/WorkspaceRepo";
 import { RouteError } from "@src/common/error";
-import { getWorkspaceDetails, getWorkspaceUsers } from "./function";
+import {
+  getWorkspaceDetails,
+  getWorkspaceUsers,
+  updateWorkspaceDetails,
+} from "./function";
 import { Request, Response } from "express";
 import HttpStatusCodes from "@src/common/HttpStatusCodes";
 
@@ -94,4 +100,33 @@ export async function getWorkspaceDetailsController(
   const details = await getWorkspaceDetails(workspaceId);
 
   return { details };
+}
+
+export async function putWorkspaceDetailsController(
+  req: Request,
+  res: Response
+) {
+  const { workspaceId } = req.params as InferType<
+    typeof putWorkspaceDetailsPathParamsSchema
+  >;
+
+  const contentType = req.headers["content-type"] ?? "unknown";
+  let files: Map<string, Express.Multer.File> | undefined;
+  if (contentType?.startsWith("multipart/form-data")) {
+    files = filesListToMap(req.files as Express.Multer.File[]);
+  }
+
+  const data = req.body as InferType<typeof putWorkspaceDetailsBodySchema>;
+  const logo = files?.get("logo")?.buffer?.toString("base64");
+
+  const result = await withTransaction(async (session) => {
+    const details = await updateWorkspaceDetails(
+      workspaceId,
+      { ...data, logo },
+      session
+    );
+    return details;
+  });
+
+  return result;
 }
