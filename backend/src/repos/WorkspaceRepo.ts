@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IWorkspace extends Document {
+export interface IWorkspace extends Document {
   logo: string;
   name: string;
   email: string;

@@ -14,3 +14,15 @@ export const workspaceCreateBodySchema = yup
     address: yup.string().required(),
   })
   .required();
+
+export const getWorkspaceDetailsPathParamsSchema = yup
+  .object({
+    workspaceId: yup.string().required(),
+  })
+  .required();
+
+export const getWorkspaceUserPathParamsSchema = yup
+  .object({
+    workspaceId: yup.string().required(),
+  })
+  .required();

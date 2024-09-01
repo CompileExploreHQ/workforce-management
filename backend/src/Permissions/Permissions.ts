@@ -1,6 +1,7 @@
 export enum Permissions {
-  // Profile
-  ProfileRead = "profile:read",
+  // User
+  UserCreate = "user:create",
+  UserRead = "user:read",
 
   // Workspace
   WorkspaceCreate = "workspace:create",

@@ -1,5 +1,4 @@
 import HttpStatusCodes from "@src/common/HttpStatusCodes";
-import { IReq, IRes } from "../common/types";
 import User from "@src/repos/UserRepo";
 import { hashPassword, validatePassword } from "@src/util/encryption";
 import { generateUniqueString } from "@src/util/string";
@@ -10,14 +9,11 @@ import { InferType } from "yup";
 import { withTransaction } from "@src/util/transaction";
 import { ClientSession } from "mongoose";
 import { RouteError } from "@src/common/error";
+import { Request, Response } from "express";
 
-export async function login(
-  req: IReq & {
-    body: InferType<typeof userLoginBodySchema>;
-  },
-  res: IRes
-) {
-  const email = req.body.email.trim() as string;
+export async function login(req: Request, res: Response) {
+  const body = req.body as InferType<typeof userLoginBodySchema>;
+  const email = body.email.trim();
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -27,10 +23,7 @@ export async function login(
     );
   }
 
-  const isValidPassword = await validatePassword(
-    req.body.password as string,
-    user.password
-  );
+  const isValidPassword = await validatePassword(body.password, user.password);
   if (!isValidPassword) {
     throw new RouteError(HttpStatusCodes.BAD_REQUEST, "Invalid Password");
   }
@@ -41,21 +34,18 @@ export async function login(
   return;
 }
 
-export async function register(
-  req: IReq & {
-    body: InferType<typeof userRegisterBodySchema>;
-  },
-  res: IRes
-) {
+export async function register(req: Request, res: Response) {
+  const body = req.body as InferType<typeof userRegisterBodySchema>;
+
   const contentType = req.headers["content-type"] ?? "unknown";
   let files: Map<string, Express.Multer.File> | undefined;
   if (contentType?.startsWith("multipart/form-data")) {
     files = filesListToMap(req.files as Express.Multer.File[]);
   }
 
-  const email = req.body.email.trim();
-  const name = req.body.name.trim();
-  const role = req.body.role;
+  const email = body.email.trim();
+  const name = body.name.trim();
+  const role = body.role;
 
   const user = await User.findOne({ email });
   if (user) {
@@ -65,7 +55,7 @@ export async function register(
     );
   }
 
-  const password = await hashPassword(req.body.password as string);
+  const password = await hashPassword(body.password);
 
   await withTransaction(async (session: ClientSession) => {
     const newUser = new User();

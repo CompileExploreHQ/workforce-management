@@ -1,17 +1,22 @@
-import HttpStatusCodes from "@src/common/HttpStatusCodes";
-import { IReq, IRes } from "../common/types";
 import { InferType } from "yup";
-import { workspaceCreateBodySchema } from "./validation";
+import {
+  getWorkspaceDetailsPathParamsSchema,
+  getWorkspaceUserPathParamsSchema,
+  workspaceCreateBodySchema,
+} from "./validation";
 import { withTransaction } from "@src/util/transaction";
 import { ClientSession } from "mongoose";
 import { filesListToMap } from "@src/util/multipart";
 import Workspace from "@src/repos/WorkspaceRepo";
 import { RouteError } from "@src/common/error";
+import { getWorkspaceDetails, getWorkspaceUsers } from "./function";
+import { Request, Response } from "express";
+import HttpStatusCodes from "@src/common/HttpStatusCodes";
 
-export async function getAllWorkspaces(req: IReq, res: IRes) {
+export async function getAllWorkspaces(req: Request, res: Response) {
   const workspaces = await Workspace.find();
 
-  return res.status(HttpStatusCodes.OK).json({
+  return {
     workspaces: workspaces.map((w) => ({
       id: w.id,
       name: w.name,
@@ -20,15 +25,11 @@ export async function getAllWorkspaces(req: IReq, res: IRes) {
       address: w.address,
       logo: w.logo,
     })),
-  });
+  };
 }
 
-export async function createWorkspace(
-  req: IReq & {
-    body: InferType<typeof workspaceCreateBodySchema>;
-  },
-  res: IRes
-) {
+export async function createWorkspace(req: Request, res: Response) {
+  const body = req.body as InferType<typeof workspaceCreateBodySchema>;
   const contentType = req.headers["content-type"] ?? "unknown";
   let files: Map<string, Express.Multer.File> | undefined;
   if (contentType?.startsWith("multipart/form-data")) {
@@ -42,10 +43,10 @@ export async function createWorkspace(
     );
   }
 
-  const name = req.body.name.trim();
-  const email = req.body.email.trim();
-  const address = req.body.address.trim();
-  const phoneNumber = req.body.phoneNumber.trim();
+  const name = body.name.trim();
+  const email = body.email.trim();
+  const address = body.address.trim();
+  const phoneNumber = body.phoneNumber.trim();
 
   const result = await withTransaction(async (session: ClientSession) => {
     const workspace = await Workspace.findOne({ email }).select("id");
@@ -68,5 +69,29 @@ export async function createWorkspace(
     return { id: insertedWorkspace.id };
   });
 
-  return res.status(HttpStatusCodes.OK).json(result);
+  return result;
+}
+
+export async function getWorkspaceUsersController(req: Request, res: Response) {
+  const { workspaceId } = req.params as InferType<
+    typeof getWorkspaceUserPathParamsSchema
+  >;
+  const employees = await getWorkspaceUsers(workspaceId);
+
+  return {
+    employees,
+  };
+}
+
+export async function getWorkspaceDetailsController(
+  req: Request,
+  res: Response
+) {
+  const { workspaceId } = req.params as InferType<
+    typeof getWorkspaceDetailsPathParamsSchema
+  >;
+
+  const details = await getWorkspaceDetails(workspaceId);
+
+  return { details };
 }
