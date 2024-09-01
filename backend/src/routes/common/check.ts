@@ -1,4 +1,4 @@
-import { ValidationErr } from "@src/common/classes";
+import { ValidationErr } from "@src/common/error";
 
 type TReqObj = Record<string, unknown>;
 
