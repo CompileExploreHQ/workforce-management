@@ -1,9 +1,8 @@
 import { expressjwt, Params } from "express-jwt";
-
-const secret = process.env.JWT_SECRET ?? "";
+import EnvVars from "@src/common/EnvVars";
 
 const authMiddlewareParams: Params = {
-  secret,
+  secret: EnvVars.JwtSecret,
   algorithms: ["HS256"],
 };
 

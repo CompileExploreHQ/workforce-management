@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import EnvVars from "@src/common/EnvVars";
 
 const SALT_ROUNDS = 10;
-const SECRET_KEY = process.env.SECRET_KEY || "secret";
 
 export const hashPassword = async (password: string): Promise<string> => {
   try {
     const secretKeyHash = crypto
       .createHash("sha256")
-      .update(SECRET_KEY)
+      .update(EnvVars.SecretKey)
       .digest("hex");
 
     const combinedPassword = `${password}${secretKeyHash}`;
@@ -27,7 +27,7 @@ export const validatePassword = async (
   try {
     const secretKeyHash = crypto
       .createHash("sha256")
-      .update(SECRET_KEY)
+      .update(EnvVars.SecretKey)
       .digest("hex");
 
     const combinedPassword = `${password}${secretKeyHash}`;

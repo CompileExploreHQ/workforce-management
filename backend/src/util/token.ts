@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
-
-const SECRET_KEY = process.env.JWT_SECRET || "secret";
+import EnvVars from "@src/common/EnvVars";
 
 interface Payload {
   sub: string;
@@ -16,7 +15,7 @@ const ALGORITHM = "HS256";
  * @returns The JWT token
  */
 export const generateToken = (payload: Payload): string => {
-  return jwt.sign(payload, SECRET_KEY, {
+  return jwt.sign(payload, EnvVars.JwtSecret, {
     algorithm: ALGORITHM,
     expiresIn: EXPIRES_IN,
   });

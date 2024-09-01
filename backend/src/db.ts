@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
+import EnvVars from "@src/common/EnvVars";
 
 const connectDB = async (): Promise<void> => {
   try {
-    const dbURI = process.env.MONGODB_URI as string;
-    await mongoose.connect(dbURI);
+    await mongoose.connect(EnvVars.MongodbUrl);
   } catch (error) {
     console.error("db connection failed:", error);
     process.exit(1);
