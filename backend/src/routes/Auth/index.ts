@@ -1,5 +1,4 @@
 import jsonApiErrors from "@src/middleware/jsonApiErrors";
-import multipartMiddleware from "@src/middleware/multipart";
 import { validateRequest } from "@src/middleware/validator";
 import { Router } from "express";
 import { userLoginBodySchema, userRegisterBodySchema } from "./validation";
@@ -11,7 +10,6 @@ const authRouter = (): Router => {
 
   router.post(
     "/register",
-    multipartMiddleware,
     validateRequest({ bodySchema: userRegisterBodySchema }),
     asyncRoute(register)
   );

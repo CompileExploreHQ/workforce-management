@@ -16,6 +16,6 @@ const WorkspaceSchema: Schema = new Schema({
   address: { type: String, required: true },
 });
 
-const WorkspaceModel = mongoose.model<IWorkspace>("Workspace", WorkspaceSchema);
+const Workspace = mongoose.model<IWorkspace>("Workspace", WorkspaceSchema);
 
-export default WorkspaceModel;
+export default Workspace;

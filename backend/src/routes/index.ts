@@ -9,9 +9,13 @@ import UserRouter from "@src/routes/User";
 import WorkspaceRoutes from "@src/routes/Workspace";
 
 import jsonApiErrors from "@src/middleware/jsonApiErrors";
+import multipartMiddleware from "@src/middleware/multipart";
+import notFound from "@src/middleware/notFound";
 
 const baseRouter = () => {
   const router = Router();
+
+  router.use(multipartMiddleware);
 
   router.use("/auth", AuthRouter());
 
@@ -20,8 +24,9 @@ const baseRouter = () => {
   router.use(attachId);
 
   router.use("/users", UserRouter());
-  router.use("/workspace", WorkspaceRoutes());
+  router.use("/workspaces", WorkspaceRoutes());
 
+  router.use(notFound());
   router.use(jsonApiErrors());
 
   return router;

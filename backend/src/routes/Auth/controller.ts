@@ -74,7 +74,9 @@ export async function register(
     newUser.sub = generateUniqueString(20);
     newUser.password = password;
     newUser.roles = [role];
-    newUser.profilePicture = files?.get("profilePicture")?.buffer?.toString();
+    newUser.profilePicture = files
+      ?.get("profilePicture")
+      ?.buffer?.toString("base64");
 
     await newUser.save({ session });
 

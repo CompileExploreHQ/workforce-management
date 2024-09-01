@@ -1,17 +1,22 @@
 import jsonApiErrors from "@src/middleware/jsonApiErrors";
 import { Router } from "express";
 import { asyncRoute } from "@src/util/routes";
-import { create } from "./controller";
+import { createWorkspace, getAllWorkspaces } from "./controller";
 import checkAccessZones from "@src/middleware/accessZones";
 import { Permissions } from "@src/Permissions/Permissions";
+import { validateRequest } from "@src/middleware/validator";
+import { workspaceCreateBodySchema } from "./validation";
 
 const workspaceRouter = (): Router => {
   const router = Router();
 
+  router.get("/all", asyncRoute(getAllWorkspaces));
+
   router.post(
     "/create",
     checkAccessZones([Permissions.WorkspaceCreate]),
-    asyncRoute(create)
+    validateRequest({ bodySchema: workspaceCreateBodySchema }),
+    asyncRoute(createWorkspace)
   );
 
   router.use(jsonApiErrors());
