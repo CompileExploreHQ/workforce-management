@@ -1,36 +1,5 @@
-import User from "@src/repos/UserRepo";
+import { getUserPermissions } from "@src/routes/User/function";
 import { RequestHandler } from "express";
-import mongoose from "mongoose";
-
-async function getUserPermissions(
-  userId: mongoose.Types.ObjectId
-): Promise<string[]> {
-  const result = await User.aggregate([
-    { $match: { _id: userId } },
-
-    {
-      $lookup: {
-        from: "roles",
-        localField: "roles",
-        foreignField: "roleName",
-        as: "user_roles",
-      },
-    },
-
-    { $unwind: "$user_roles" },
-
-    { $unwind: "$user_roles.permissions" },
-
-    {
-      $group: {
-        _id: "$_id",
-        permissions: { $addToSet: "$user_roles.permissions" },
-      },
-    },
-  ]);
-
-  return result.length > 0 ? result[0].permissions : [];
-}
 
 function hasAllOfAccessZones(
   zones: string[],

@@ -6,6 +6,34 @@ import { putUserDetailsBodySchema } from "./validation";
 import mongoose, { ClientSession } from "mongoose";
 import logger from "jet-logger";
 
+export async function getUserPermissions(userId: string): Promise<string[]> {
+  const result = await User.aggregate([
+    { $match: { _id: userId } },
+
+    {
+      $lookup: {
+        from: "roles",
+        localField: "roles",
+        foreignField: "roleName",
+        as: "user_roles",
+      },
+    },
+
+    { $unwind: "$user_roles" },
+
+    { $unwind: "$user_roles.permissions" },
+
+    {
+      $group: {
+        _id: "$_id",
+        permissions: { $addToSet: "$user_roles.permissions" },
+      },
+    },
+  ]);
+
+  return result.length > 0 ? result[0].permissions : [];
+}
+
 export async function getUserDetailsById(
   userId: string
 ): Promise<Omit<IUser, "password" | "sub">> {

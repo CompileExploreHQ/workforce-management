@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { API_ENDPOINT } from "../config";
 
 if (!API_ENDPOINT) {
@@ -10,6 +10,26 @@ export const authorisedRequester = axios.create({
   baseURL: API_ENDPOINT,
   withCredentials: true,
 });
+
+// Add a response interceptor
+authorisedRequester.interceptors.response.use(
+  (response: AxiosResponse) => {
+    // If the response is successful, just return the response
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      // If a 401 status code is received, remove the token from localStorage
+      localStorage.removeItem("token");
+
+      // Reload the page
+      window.location.reload();
+    }
+
+    // Return the error to the calling code
+    return Promise.reject(error);
+  }
+);
 
 function wrapInstance(instance: AxiosInstance) {
   return {

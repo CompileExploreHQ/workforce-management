@@ -212,7 +212,7 @@ const Register: React.FC = () => {
                 onClick={() => {
                   replace("/login");
                 }}
-                sx={{ textDecoration: "underline" }}
+                sx={{ textDecoration: "underline", cursor: "pointer" }}
               >
                 Already Register? Login
               </Box>

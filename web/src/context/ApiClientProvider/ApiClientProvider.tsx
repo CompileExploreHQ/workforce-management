@@ -29,7 +29,7 @@ export const ApiClientProvider: React.FC<Props> = ({ children }) => {
       const token = await getToken();
 
       if (!token) {
-        logout({ returnTo: window.location.origin });
+        logout();
         return config;
       }
 

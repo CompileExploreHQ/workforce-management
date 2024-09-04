@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { getUserDetailsById, updateUserDetails } from "./function";
+import {
+  getUserDetailsById,
+  getUserPermissions,
+  updateUserDetails,
+} from "./function";
 import { InferType } from "yup";
 import {
   getUserDetailsPathParamsSchema,
@@ -13,8 +17,12 @@ export async function getUserDetails(req: Request, res: Response) {
     typeof getUserDetailsPathParamsSchema
   >;
 
-  const details = await getUserDetailsById(userId);
-  return { details };
+  const id = userId === "me" ? req.body.requestUserID : userId;
+
+  const details = await getUserDetailsById(id);
+  const accessZones = await getUserPermissions(id);
+
+  return { details, accessZones };
 }
 
 export async function putUserDetails(req: Request, res: Response) {

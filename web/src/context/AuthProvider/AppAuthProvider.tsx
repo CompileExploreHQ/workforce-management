@@ -37,8 +37,7 @@ export const AppAuthProvider: React.FC<Props> = ({ children }) => {
 
   const logout = React.useCallback(() => {
     localStorage.removeItem("token");
-    // eslint-disable-next-line no-restricted-globals
-    location.reload();
+    setAuthorized(false);
   }, []);
 
   const getToken = React.useCallback(() => {

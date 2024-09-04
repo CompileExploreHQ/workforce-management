@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { BrowserRouter } from "react-router-dom";
 import { StylesProvider } from "@mui/styles";
 import { AuthProvider } from "./context/AuthProvider";
+import { Theme } from "./components/Theme";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,16 +25,18 @@ export const AppProviders: React.FC<Props> = ({ children }) => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <StylesProvider injectFirst>
-        <Helmet
-          titleTemplate="%s - Workforce Management"
-          defaultTitle="Workforce Management"
-        />
+        <Theme baseline>
+          <Helmet
+            titleTemplate="%s - Workforce Management"
+            defaultTitle="Workforce Management"
+          />
 
-        <BrowserRouter>
-          <SnackbarProvider maxSnack={3}>
-            <AuthProvider>{children}</AuthProvider>
-          </SnackbarProvider>
-        </BrowserRouter>
+          <BrowserRouter>
+            <SnackbarProvider maxSnack={3}>
+              <AuthProvider>{children}</AuthProvider>
+            </SnackbarProvider>
+          </BrowserRouter>
+        </Theme>
       </StylesProvider>
       <ReactQueryDevtools position="bottom-right" />
     </QueryClientProvider>
