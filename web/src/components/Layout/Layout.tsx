@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Box } from "@mui/material";
-import { Header } from "./Header";
-
-export const headerHeight = 56;
+import { Header, headerHeight } from "./Header";
 
 interface Props {
   children: React.ReactNode;

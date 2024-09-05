@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
 import { NavItem } from "./components/NavItem";
 import { useAccessZones } from "../../../hooks/useAccessZones";
 import { Box, BoxProps, IconButton } from "@mui/material";
