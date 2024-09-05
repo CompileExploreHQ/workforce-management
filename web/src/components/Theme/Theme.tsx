@@ -32,6 +32,11 @@ const defaultTheme: ThemeOptions = {
   typography: {
     fontFamily: `"Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif`,
   },
+  colorSet: {
+    lightGray: "#F9F9F8",
+    paleBlue: "#EFF1F2",
+    success: "#3A9F11",
+  },
 };
 
 export interface ThemeProps {

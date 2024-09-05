@@ -12,6 +12,7 @@ const Item = styled(NavLink)`
 
   &.active {
     color: ${(p) => p.theme.palette.primary.main};
+    font-weight: 600;
 
     &::after {
       content: "";
