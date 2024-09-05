@@ -1,6 +1,11 @@
+import { Form, Formik } from "formik";
+import { useCurrentUser } from "../../../context/CurrentUserProvider";
+import styled from "styled-components";
+import * as yup from "yup";
 import {
   Box,
   Button,
+  CardMedia,
   FormControl,
   Grid,
   InputLabel,
@@ -9,13 +14,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Form, Formik } from "formik";
-import * as yup from "yup";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { styled } from "@mui/material/styles";
 import { useSnackbar } from "notistack";
-import axios from "axios";
-import { useHistory } from "react-router-dom";
+import { useMutation } from "react-query";
+import { putUserDetails } from "../../../api";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -33,51 +35,72 @@ export const validationSchema = yup
   .object({
     name: yup.string().required("Required"),
     email: yup.string().email("Invalid Email").required("Required"),
-    password: yup.string().required("Required"),
     role: yup.string().required("Required"),
-    profilePicture: yup.mixed().required("Required"),
+    profilePicture: yup.mixed(),
   })
   .required();
 
-const Register: React.FC = () => {
-  const { replace } = useHistory();
-
+const Edit: React.FC = () => {
+  const { details, refetch } = useCurrentUser();
   const { enqueueSnackbar } = useSnackbar();
+
+  const { mutateAsync } = useMutation(putUserDetails);
 
   return (
     <Formik
       initialValues={{
-        name: "",
-        email: "",
-        password: "",
-        role: "",
+        name: details.name,
+        email: details.email,
+        role: details.roles[0],
         profilePicture: undefined,
       }}
       validationSchema={validationSchema}
       onSubmit={async (values, actions) => {
-        try {
-          const formData = new FormData();
+        console.log("helo");
 
-          Object.keys(values).forEach((key) => {
-            formData.append(key, (values as any)[key]);
-          });
+        // try {
+        const formData = new FormData();
 
-          const response = await axios.post("/api/auth/register", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
+        Object.keys(values).forEach((key) => {
+          formData.append(key, (values as any)[key]);
+        });
+
+        await mutateAsync(
+          {
+            userId: "me",
+            headers: { "Content-Type": "multipart/form-data" },
+            body: formData as any,
+          },
+          {
+            onSuccess: () => {
+              enqueueSnackbar("Successfully Registered", {
+                variant: "success",
+              });
+              refetch();
             },
-          });
-
-          if (response.status === 200) {
-            enqueueSnackbar("Successfully Registered", { variant: "success" });
-            return;
+            onError: (error: any) => {
+              enqueueSnackbar(
+                error.response?.data?.error ?? "Something went wrong",
+                { variant: "error" }
+              );
+            },
           }
-        } catch (error: any) {
-          enqueueSnackbar(
-            error.response?.data?.error ?? "Something went wrong",
-            { variant: "error" }
-          );
-        }
+        );
+
+        // const response = await axios.post("/api/auth/register", formData, {
+        //   headers: {},
+        // });
+
+        // if (response.status === 200) {
+        //   enqueueSnackbar("Successfully Registered", { variant: "success" });
+        //   return;
+        // }
+        // } catch (error: any) {
+        //   enqueueSnackbar(
+        //     error.response?.data?.error ?? "Something went wrong",
+        //     { variant: "error" }
+        //   );
+        // }
 
         actions.setSubmitting(false);
       }}
@@ -86,9 +109,16 @@ const Register: React.FC = () => {
         <Form onSubmit={props.handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant="h5" component="h5">
-                Register
-              </Typography>
+              <CardMedia
+                component="img"
+                src={`data:image/png;base64, ${details.profilePicture}`}
+                sx={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: "16px",
+                  objectFit: "cover",
+                }}
+              />
             </Grid>
 
             <Grid item xs={12}>
@@ -125,26 +155,6 @@ const Register: React.FC = () => {
               {props.errors.email && (
                 <Typography fontSize="small" color="error">
                   {props.errors.email}
-                </Typography>
-              )}
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                type="password"
-                label="Password"
-                size="small"
-                variant="outlined"
-                onChange={props.handleChange}
-                onBlur={props.handleBlur}
-                value={props.values.password}
-                name="password"
-                color={props.errors.password ? "error" : "primary"}
-                disabled={props.isSubmitting}
-              />
-              {props.errors.password && (
-                <Typography fontSize="small" color="error">
-                  {props.errors.password}
                 </Typography>
               )}
             </Grid>
@@ -206,23 +216,13 @@ const Register: React.FC = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Box
-                mb={1}
-                onClick={() => {
-                  replace("/login");
-                }}
-                sx={{ textDecoration: "underline", cursor: "pointer" }}
-              >
-                Already Register? Login
-              </Box>
-
               <Button
                 type="submit"
                 variant="contained"
                 size="medium"
-                disabled={!props.isValid || props.isSubmitting}
+                disabled={props.isSubmitting}
               >
-                Register
+                Save
               </Button>
             </Grid>
           </Grid>
@@ -232,6 +232,6 @@ const Register: React.FC = () => {
   );
 };
 
-const RegisterPage = () => <Register />;
+const EditPage = () => <Edit />;
 
-export default RegisterPage;
+export default EditPage;

@@ -18,7 +18,7 @@ export default async function attachId(
         throw new RouteError(HttpStatusCodes.FORBIDDEN, "Unauthorized");
       }
 
-      req.body.requestUserID = user._id;
+      req.body.requestUserID = user.id.toString();
     }
     return next();
   } catch (err) {

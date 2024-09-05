@@ -8,7 +8,7 @@ import logger from "jet-logger";
 
 export async function getUserPermissions(userId: string): Promise<string[]> {
   const result = await User.aggregate([
-    { $match: { _id: userId } },
+    { $match: { _id: new mongoose.Types.ObjectId(userId) } },
 
     {
       $lookup: {
@@ -38,7 +38,11 @@ export async function getUserDetailsById(
   userId: string
 ): Promise<Omit<IUser, "password" | "sub">> {
   try {
-    const user = await User.findOne({ _id: userId }).select("-password -sub");
+    console.log('userIdss', userId);
+    
+    const user = await User.findById({
+      _id: new mongoose.Types.ObjectId(userId),
+    }).select("-password -sub");
 
     if (!user) {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, "User not found");

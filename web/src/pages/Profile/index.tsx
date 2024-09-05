@@ -1,8 +1,12 @@
-import { useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { Workspace } from "../../components/Workspace";
-import { useRouteMatch } from "react-router-dom";
+import { Redirect, Route, Switch, useRouteMatch } from "react-router-dom";
+import { Loading } from "../../components/Loading";
 
-const Profile: React.FC = () => {
+const OverviewPage = lazy(async () => import("./Overview"));
+const EditPage = lazy(async () => import("./Edit"));
+
+const Overview: React.FC = () => {
   const { url } = useRouteMatch();
 
   const workspaceItems = useMemo(() => {
@@ -26,11 +30,17 @@ const Profile: React.FC = () => {
         items: workspaceItems,
       }}
     >
-      <>Profile</>
+      <Suspense fallback={<Loading isCenter />}>
+        <Switch>
+          <Route path={`${url}/overview`} render={() => <OverviewPage />} />
+          <Route path={`${url}/edit`} render={() => <EditPage />} />
+          <Route render={() => <Redirect to={`${url}/overview`} />} />
+        </Switch>
+      </Suspense>
     </Workspace>
   );
 };
 
-const ProfilePage = () => <Profile />;
+const ProfilePage = () => <Overview />;
 
 export default ProfilePage;

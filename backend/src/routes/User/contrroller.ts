@@ -41,9 +41,11 @@ export async function putUserDetails(req: Request, res: Response) {
     ?.get("profilePicture")
     ?.buffer?.toString("base64");
 
+  const id = userId === "me" ? req.body.requestUserID : userId;
+
   const result = await withTransaction(async (session) => {
     const details = await updateUserDetails(
-      userId,
+      id,
       { ...data, profilePicture },
       session
     );
