@@ -6,6 +6,7 @@ export interface UserDetails {
   name: string;
   email: string;
   profilePicture: string;
+  workspaceId?: string;
 }
 export interface GetUsersUserResponse {
   details: UserDetails;
@@ -26,6 +27,28 @@ export type GetUsersUserProps = GetProps<
 export async function getUsersUser({ userId, ...props }: GetUsersUserProps) {
   return get<GetUsersUserResponse, void, void, GetUsersUserPathParams>(
     `/users/${encodeURIComponent(userId)}/details`,
+    props
+  );
+}
+export interface WorkspaceSummary {
+  id: string;
+  name: string;
+  logo: string;
+}
+export interface GetWorkspaceListResponse {
+  workspaces: WorkspaceSummary[];
+}
+
+export type GetWorkspaceListProps = GetProps<
+  GetWorkspaceListResponse,
+  void,
+  void,
+  void
+> & {};
+
+export async function getWorkspaceList(props: GetWorkspaceListProps) {
+  return get<GetWorkspaceListResponse, void, void, void>(
+    `/workspaces/all`,
     props
   );
 }

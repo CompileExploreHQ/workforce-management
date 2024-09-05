@@ -26,9 +26,6 @@ export async function getAllWorkspaces(req: Request, res: Response) {
     workspaces: workspaces.map((w) => ({
       id: w.id,
       name: w.name,
-      email: w.email,
-      phoneNumber: w.phoneNumber,
-      address: w.address,
       logo: w.logo,
     })),
   };

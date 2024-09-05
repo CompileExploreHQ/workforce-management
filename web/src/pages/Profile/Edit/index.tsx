@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   CardMedia,
+  CircularProgress,
   FormControl,
   Grid,
   InputLabel,
@@ -16,8 +17,8 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useSnackbar } from "notistack";
-import { useMutation } from "react-query";
-import { putUserDetails } from "../../../api";
+import { useMutation, useQuery } from "react-query";
+import { getWorkspaceList, putUserDetails } from "../../../api";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -36,6 +37,7 @@ export const validationSchema = yup
     name: yup.string().required("Required"),
     email: yup.string().email("Invalid Email").required("Required"),
     role: yup.string().required("Required"),
+    workspaceId: yup.string(),
     profilePicture: yup.mixed(),
   })
   .required();
@@ -43,6 +45,10 @@ export const validationSchema = yup
 const Edit: React.FC = () => {
   const { details, refetch } = useCurrentUser();
   const { enqueueSnackbar } = useSnackbar();
+
+  const { data, isLoading } = useQuery(["getWorkspaceList"], async () =>
+    getWorkspaceList({})
+  );
 
   const { mutateAsync } = useMutation(putUserDetails);
 
@@ -53,12 +59,10 @@ const Edit: React.FC = () => {
         email: details.email,
         role: details.roles[0],
         profilePicture: undefined,
+        workspaceId: details.workspaceId || undefined,
       }}
       validationSchema={validationSchema}
       onSubmit={async (values, actions) => {
-        console.log("helo");
-
-        // try {
         const formData = new FormData();
 
         Object.keys(values).forEach((key) => {
@@ -86,21 +90,6 @@ const Edit: React.FC = () => {
             },
           }
         );
-
-        // const response = await axios.post("/api/auth/register", formData, {
-        //   headers: {},
-        // });
-
-        // if (response.status === 200) {
-        //   enqueueSnackbar("Successfully Registered", { variant: "success" });
-        //   return;
-        // }
-        // } catch (error: any) {
-        //   enqueueSnackbar(
-        //     error.response?.data?.error ?? "Something went wrong",
-        //     { variant: "error" }
-        //   );
-        // }
 
         actions.setSubmitting(false);
       }}
@@ -160,7 +149,7 @@ const Edit: React.FC = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Box sx={{ maxWidth: 225 }}>
+              <Box sx={{ maxWidth: 240 }}>
                 <FormControl
                   fullWidth
                   size="small"
@@ -187,6 +176,43 @@ const Edit: React.FC = () => {
                 <Typography fontSize="small" color="error">
                   {props.errors.role}
                 </Typography>
+              )}
+            </Grid>
+
+            <Grid item xs={12}>
+              {isLoading ? (
+                <CircularProgress size={30} />
+              ) : (
+                <>
+                  <Box sx={{ maxWidth: 240 }}>
+                    <FormControl
+                      fullWidth
+                      size="small"
+                      disabled={props.isSubmitting}
+                    >
+                      <InputLabel id="workspace-label">Workspace</InputLabel>
+                      <Select
+                        labelId="workspace-label"
+                        label="workspace"
+                        variant="outlined"
+                        onChange={props.handleChange}
+                        onBlur={props.handleBlur}
+                        value={props.values.workspaceId}
+                        name="workspaceId"
+                        color={props.errors.role ? "error" : "primary"}
+                      >
+                        {data?.workspaces?.map((w) => {
+                          return <MenuItem value={w.id}>{w.name}</MenuItem>;
+                        })}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  {props.errors.workspaceId && (
+                    <Typography fontSize="small" color="error">
+                      {props.errors.workspaceId}
+                    </Typography>
+                  )}
+                </>
               )}
             </Grid>
 

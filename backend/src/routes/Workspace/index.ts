@@ -22,11 +22,7 @@ import {
 const workspaceRouter = (): Router => {
   const router = Router({ mergeParams: true });
 
-  router.get(
-    "/all",
-    checkAccessZones([Permissions.WorkspaceRead]),
-    asyncRoute(getAllWorkspaces)
-  );
+  router.get("/all", asyncRoute(getAllWorkspaces));
 
   router.post(
     "/create",
